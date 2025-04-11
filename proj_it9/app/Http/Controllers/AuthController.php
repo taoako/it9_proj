@@ -4,26 +4,26 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
 
 class AuthController extends Controller
 {
     public function showLogin()
     {
-        return view('auth.pin-login');
+        return view('auth.login');
     }
 
     public function login(Request $request)
     {
-        $request->validate(['pin' => 'required|digits:4']);
+        $request->validate([
+            'username' => 'required',
+            'password' => 'required',
+        ]);
 
-        $user = User::where('pin', $request->pin)->first();
-        if ($user) {
-            Auth::login($user);
+        if (Auth::attempt($request->only('username', 'password'))) {
             return redirect()->route('dashboard');
         }
 
-        return back()->withErrors(['pin' => 'Invalid PIN']);
+        return back()->withErrors(['username' => 'Invalid username or password']);
     }
 
     public function logout()
